@@ -1,0 +1,132 @@
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de ' d'une campagne de mail. time="1s"/ des contacts, crï¿½ation de la campagne et expï¿½dition 0</speak 1>" de 0.515 sur 7.067958333333333 secondes 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>ffmpeg -f lavfi -i anullsrc=channel_layout=1:sample_rate=48000 -t 0.515 input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -i input.wav -acodec libopus -i ./speech/voice_7963546140306018896_fr-FR.ogg -filter_complex "[0:a]volume=1[a0];[1:a]adelay=515|515,volume=1[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de ' ï¿½ OASIS. time="1s"/ du login et du mot de passe 0</speak 1>" de 9.167 sur 4.987916666666667 secondes 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -i input.wav -acodec libopus -i ./speech/voice_7129486007527293072_fr-FR.ogg -filter_complex "[0:a]volume=1[a0];[1:a]adelay=9167|9167,volume=1[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de 'Pour se connecter, on utilise l'identifiant et le mot de passe fourni par l'administrateur ï¿½ la crï¿½ation du compte" de 14.175 sur 7.305458333333333 secondes 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -i input.wav -acodec libopus -i ./speech/voice_-7168101105846269373_fr-FR.ogg -filter_complex "[0:a]volume=1[a0];[1:a]adelay=14175|14175,volume=1[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Ajout de ./clavier.wav ï¿½ la position 21724 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y  -i ./clavier.wav -t 0.23698115348815918 -c copy output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y -i input.wav -i output_insert.wav -filter_complex "[0:a]volume=1[a0];[1:a]adelay=21724|21724,volume=0.6[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output_temp.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output_temp.wav output.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Ajout de ./clavier.wav ï¿½ la position 22432 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y  -i ./clavier.wav -t 0.17200088500976562 -c copy output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y -i input.wav -i output_insert.wav -filter_complex "[0:a]volume=1[a0];[1:a]adelay=22432|22432,volume=0.6[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output_temp.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output_temp.wav output.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de 'En cas d'oublie, on peut toujours se faire renvoyer son mot de passe" de 26.111 sur 4.21375 secondes 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -i input.wav -acodec libopus -i ./speech/voice_3729935021199561809_fr-FR.ogg -filter_complex "[0:a]volume=1[a0];[1:a]adelay=26111|26111,volume=1[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Ajout de ./click.mp3 ï¿½ la position 35202 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y  -i ./click.mp3 -t 0.2 -c copy output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y -i input.wav -i output_insert.wav -filter_complex "[0:a]volume=1[a0];[1:a]adelay=35202|35202,volume=0.6[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output_temp.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output_temp.wav output.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de 'L'utilisateur est automatiquement reconnectï¿½ sur sa derniï¿½re page consultï¿½" de 35.409 sur 4.89925 secondes 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -i input.wav -acodec libopus -i ./speech/voice_-8233652131669852949_fr-FR.ogg -filter_complex "[0:a]volume=1[a0];[1:a]adelay=35409|35409,volume=1[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Ajout de ./click.mp3 ï¿½ la position 42937 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y  -i ./click.mp3 -t 0.2 -c copy output_insert.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>call ffmpeg -y -i input.wav -i output_insert.wav -filter_complex "[0:a]volume=1[a0];[1:a]adelay=42937|42937,volume=0.6[a1];[a0][a1]amix=inputs=2,volume=2[a]" -map "[a]" output_temp.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output_temp.wav output.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del input.wav 
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>copy output.wav input.wav 
+        1 fichier(s) copi‚(s).
+
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>del output_insert.wav 
+(venv) C:\Users\hhoareau\PycharmProjects\test_kerberus>#Insertion de '<speak>Crï¿½ation de contact.<break time="1s"/></speak>" de 81.892 sur 2.4170416666666665 secondes
