@@ -1,15 +1,17 @@
+from sys import argv
 
 from DataCultureUser import DataCultureUser
 
 #tuto=DataCultureUser(domain="https://testdcp.f80.fr",fastMode=False)
 
 
-tuto=DataCultureUser(domain="http://localhost:4200/?no_auto_login",fastMode=False,quality=1)
+tuto=DataCultureUser(argv[1],domain="http://localhost:4200/?no_auto_login",fastMode=False,quality=int(argv[2]))
 
 tuto.size(800,1000)
 
 tuto.capture("Search","Data Culture Pro","Recherche et édition des profils",background="https://testdcp.f80.fr/assets/img/anciens.jpg")
 tuto.intro(False)
+
 tuto.first_screen(comment=True)
 tuto.login("hhoareau@gmail.com","123456",quick=False)
 

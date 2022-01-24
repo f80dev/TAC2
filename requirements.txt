@@ -1,0 +1,6 @@
+unidecode
+mss
+nerodia
+google-cloud-texttospeech
+opencv-python
+mutagen

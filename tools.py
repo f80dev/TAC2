@@ -35,7 +35,8 @@ class Tools:
 
     fps=15 #réalisation du film a 15 images par secondes
 
-    def __init__(self,proxy="",speech_engine="fr-FR-Wavenet-A"):
+    def __init__(self,proxy="",json_path="",speech_engine="fr-FR-Wavenet-A"):
+        self.json_path = json_path
         self.subtitle_style = "font-weight:bolder;font-size:large;color:yellow;padding: 5px;"
         self.capture_file=""
         self.subdir = ""
@@ -576,7 +577,8 @@ class Tools:
         if len(output_filename) == 0:
             output_filename = self.getSoundFile(text)
 
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:\\Users\\hhoar\\PycharmProjects\\test_kerberus\\testandcapture-9fc576cad7c7.json"
+        #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:\\Users\\hhoar\\PycharmProjects\\test_kerberus\\testandcapture-9fc576cad7c7.json"
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=self.json_path
         if not exists(output_filename):
             if self.client is None:
                 self.client = texttospeech.TextToSpeechClient()
