@@ -40,12 +40,19 @@ class DataCultureUser(Tools):
             self.click("cmdYes")
             self.subtitle("Après validation, un code secret est immédiatement envoyé à l'utilisateur")
 
-            self.clavier(password,elt="txtCode",subtitle="il saisie ce code")
+            self.clavier(password,elt="txtCode",subtitle="Après consultation de sa boite mail, il saisie ce code")
             self.wait(1)
             self.click("cmdValider")
             self.wait(1.5)
             self.subtitle("L'utilisateur est immédiatement redirigé vers la fenêtre de recherche")
-            self.subtitle("De nouvelles fonctionnalitées sont disponibles et les fiches étudiants présentent plus d'informations")
+            self.subtitle("Il accède maintenant avec un profil 'Connecté'")
+            self.subtitle("De nouvelles informations et fonctionnalitées sont disponibles dans l'application")
+
+            self.click("profils",0)
+            self.subtitle("... et les fiches étudiantes présentent plus d'informations")
+            self.click("profils",0)
+
+
 
     def change_profil(self):
         self.open_menu("cmdEditPerms")
@@ -105,6 +112,31 @@ class DataCultureUser(Tools):
                 return self.click(fiche)
 
 
+    def explain_write_news(self):
+        article="""
+            Avant la palme, le pataquès. Il y a eu un blanc, un voile de stupeur tombant sur la foule de ceux, 
+            dans la salle ou de part et d’autre de l’écran, qui n’étaient pas sûrs d’avoir bien entendu. 
+            La fureur du président Spike Lee – manifestement costumé par RuPaul – était perceptible d’être ainsi réprimandé 
+            et quasi plaqué au sol par son jury pour avoir saboté le traditionnel suspense infiniment retardé de l’annonce de la palme d’or. 
+        """
+
+        if not "htmledit" in self.browser.url: self.open_menu("cmdPublish")
+
+        self.subtitle("Data Culture dispose d'un outil de rédaction d'article directement publié sur le site")
+        self.show("tagEditor","Chaque article est taggé pour permettre une consultation par thème")
+        self.show("htmlEditorZone","Le rédacteur peut éditer librement son contenu et le mettre en page directement dans l'outil")
+        self.clavier(article,"htmlEditorZone")
+        self.show("cmdImport",
+                  "Data Culture permet également d'importer directement un article écrit dans un autre outil")
+        self.show("cmdSave","Avant sa publication, l'article peut être enregistré en brouillon")
+        self.show("cmdPublish","Terminé, l'article peut être soumis au responsable éditorial pour publication par se dernier")
+        self.click('cmdPublish')
+
+
+
+
+
+
     def show_realisation(self):
         fiche = self.find("cardAction", 1)
         self.click(self.find("cmdOpenWork",0,fiche))
@@ -143,6 +175,10 @@ class DataCultureUser(Tools):
         self.show(self.find("cmdShare"),"Partager avec votre réseau")
         self.show(self.find("cmdRefresh"),"Ré-actualiser")
         self.show(self.find("cmdOpenSocialGraph"),"Il est également possible de faire une analyse du réseau relationnel des anciens")
+        self.click(self.find("cmdOpenSocialGraph"))
+        self.wait(5)
+        self.click("cmdBack")
+        self.wait(0.5)
         self.click("cmdBack")
 
 
@@ -162,18 +198,39 @@ class DataCultureUser(Tools):
         self.wait(delay)
         self.click("cmdCancel")
 
+        self.clavier("duc*","txtSearch","... sur une partie du nom")
+        self.wait(delay)
+        self.click("cmdCancel")
+
+        self.clavier("titane","txtSearch","... sur un film")
+        self.wait(delay)
+        self.click("cmdCancel")
+
+        self.clavier("palme","txtSearch","... sur un prix")
+        self.wait(delay)
+        self.click("cmdCancel")
+
+        self.clavier("Tanger","txtSearch")
+        self.wait(delay)
+        self.click("cmdCancel")
+
         self.clavier("1995", "txtSearch", "... par promotion",show=False)
         self.wait(delay)
         self.click("cmdCancel")
 
-        self.clavier("réalisation", "txtSearch", "... par formation",show=False)
+        self.clavier("décor", "txtSearch", "... par formation",show=False)
         self.wait(delay)
         self.click("cmdCancel")
 
         self.click("cmdExpertMode","Data Culture dispose également d'un mode de recherche plus sophistiqué")
         self.subtitle("Dans ce mode il est possible de combiner plusieurs critères comme la formation, le nom, le prénom")
+        self.wait(0.5)
+
+        self.clavier("céline","txtFirstname")
+        self.clavier("réalisation","txtFormation")
         self.wait(2.0)
         self.click("cmdSimpleMode")
+        self.click("cmdCancel")
 
 
     def intro(self,generique=True):
@@ -187,6 +244,8 @@ class DataCultureUser(Tools):
             self.subtitle("Il permet d'effectuer des recherches multi-critères sur l'ensemble des profils",position=center)
             self.subtitle("de consulter la filmographie de chaque profil étudiant",position=center)
             self.subtitle("d'obtenir des données statistiques anonymisées sur les parcours professionnels des anciens étudiants",position=center)
+            self.subtitle("Chaque étudiant peut maintenir à jour son profil", position=center)
+            self.subtitle("Il dispose d'outils pour analyser les annuaires de cinéma, rechercher des postes, contacter d'autres étudiants", position=center)
             self.removeCache(id_cache="intro")
 
 
@@ -195,7 +254,12 @@ class DataCultureUser(Tools):
         self.click(self.find("btnStart",onlyId=True))
         if comment:
             self.subtitle("Dès l'ouverture de l'application, le visiteur accède au catalogue des profils étudiants")
-            self.show(self.find("profils",1),text="Chaque profil est présenté sous la forme d'une fiche individuelle")
+            self.click("tutoSideMenu","Une aide contextuelle est disponible dans la plupart des écrans de Data Culture")
+            elt=self.find("profils",1)
+            self.show(elt,text="Chaque profil est présenté sous la forme d'une fiche individuelle")
+            self.click(elt)
+            self.subtitle("Au dos de chaque fiche, suivant le profil du visiteur, certaines commandes permettent d'en savoir plus")
+
 
 
 
