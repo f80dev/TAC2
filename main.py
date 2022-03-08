@@ -1,47 +1,54 @@
 from sys import argv
 
-from DataCultureUser import DataCultureUser
+if "scenario" in argv:
+    from lafaaac import LaFaaac
+    tuto=LaFaaac()
+    tuto.login("j.lecanu@femis.fr","123456789")
+    tuto.open_module(1)
 
-#tuto=DataCultureUser(domain="https://testdcp.f80.fr",fastMode=False)
+if "dataculture" in argv:
+    from DataCultureUser import DataCultureUser
 
-
-tuto=DataCultureUser(argv[1],domain="http://localhost:4200/?no_auto_login",fastMode=False,quality=int(argv[2]))
-
-tuto.size(800,1000)
-
-tuto.capture("Search","Data Culture Pro","Recherche et édition des profils",background="https://testdcp.f80.fr/assets/img/anciens.jpg")
-tuto.intro(False)
-
-tuto.first_screen(comment=True)
-tuto.login("hhoareau@gmail.com","123456",quick=False)
-
-#tuto.edit_profil(0)
-
-tuto.explain_search()
-tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
-
-tuto.capture("Stats","Data Culture Pro","Module statistiques")
-tuto.explain_statistic()
-tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
-
-tuto.capture("EditProfil","Data Culture Pro","Consultation et édition des profils")
-tuto.search("sciamma")
-tuto.explain_fiche(0)
-tuto.edit_profil(0)
-tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
+    #tuto=DataCultureUser(domain="https://testdcp.f80.fr",fastMode=False)
 
 
+    tuto=DataCultureUser(argv[1],domain="http://localhost:4200/?no_auto_login",fastMode=False,quality=int(argv[2]))
 
-# tuto.add_experience("Comment je me suis disputé")
-# tuto.explain_fiche(0)
-# tuto.show_realisation()
-# tuto.quit("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS")
-#
-# tuto.capture("FonctionAnnexe","Data Culture Pro","Fonctions annexes",background="https://dcp.f80.fr/assets/img/anciens.jpg")
-# tuto.change_profil()
-# tuto.add_film()
-# tuto.show_statistique()
-tuto.close()
+    tuto.size(800,1000)
+
+    tuto.capture("Search","Data Culture Pro","Recherche et édition des profils",background="https://testdcp.f80.fr/assets/img/anciens.jpg")
+    tuto.intro(False)
+
+    tuto.first_screen(comment=True)
+    tuto.login("hhoareau@gmail.com","123456",quick=False)
+
+    #tuto.edit_profil(0)
+
+    tuto.explain_search()
+    tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
+
+    tuto.capture("Stats","Data Culture Pro","Module statistiques")
+    tuto.explain_statistic()
+    tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
+
+    tuto.capture("EditProfil","Data Culture Pro","Consultation et édition des profils")
+    tuto.search("sciamma")
+    tuto.explain_fiche(0)
+    tuto.edit_profil(0)
+    tuto.stop("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS",subdir="data_culture")
+
+
+
+    # tuto.add_experience("Comment je me suis disputé")
+    # tuto.explain_fiche(0)
+    # tuto.show_realisation()
+    # tuto.quit("Data Culture Pro","L'annuaire interractif des anciens élèves de la FEMIS")
+    #
+    # tuto.capture("FonctionAnnexe","Data Culture Pro","Fonctions annexes",background="https://dcp.f80.fr/assets/img/anciens.jpg")
+    # tuto.change_profil()
+    # tuto.add_film()
+    # tuto.show_statistique()
+    tuto.close()
 
 
 #f=FemisUser("j.lecanu","azerty")
