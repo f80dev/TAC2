@@ -35,8 +35,9 @@ class Tools:
 
     fps=15 #réalisation du film a 15 images par secondes
 
-    def __init__(self,proxy="",speech_engine="fr-FR-Wavenet-A"):
-        self.subtitle_style = "font-size:x-large;color:white;padding: 5px;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;"
+    def __init__(self,proxy="",json_path="",speech_engine="fr-FR-Wavenet-A"):
+        self.json_path = json_path
+        self.subtitle_style = "font-weight:bolder;font-size:large;color:yellow;padding: 5px;"
         self.capture_file=""
         self.subdir = ""
         self.speech_engine=speech_engine
@@ -63,9 +64,6 @@ class Tools:
 
     def back(self):
         self.browser.back()
-
-    def set_style(self,style):
-        self.subtitle_style=style
 
     def init_zone_capture(self):
         offset = 125
@@ -180,6 +178,7 @@ class Tools:
 
 
 
+
     def find(self,id,index=0,pere=None,onlyId=False,onlyName=False):
         if pere is None:pere=self.browser
 
@@ -208,9 +207,8 @@ class Tools:
             return id
 
 
-    def size(self, width, height,pos_x=0,pos_y=0):
+    def size(self, width, height):
         self.browser.window().resize_to(width,height)
-        self.browser.window().move_to(pos_x,pos_y)
         self.init_zone_capture()
 
 
@@ -275,7 +273,7 @@ class Tools:
         self.insertCache("black", id_cache="cache_capture", position=9999,delayInSec=0.1)
         self.scheduler.add_job(self.job_capture,"interval",minutes=interval_en_minutes,max_instances=1,id="capture_job")
         self.dtStartCapture = self.now()
-
+        self.fastMode=False
         if len(title)>0:
             self.title(title,subtitle=subtitle,background=background)
             self.removeCache(id_cache="cache_capture")
@@ -579,7 +577,8 @@ class Tools:
         if len(output_filename) == 0:
             output_filename = self.getSoundFile(text)
 
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:\\Users\\hhoar\\PycharmProjects\\test_kerberus\\testandcapture-9fc576cad7c7.json"
+        #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:\\Users\\hhoar\\PycharmProjects\\test_kerberus\\testandcapture-9fc576cad7c7.json"
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=self.json_path
         if not exists(output_filename):
             if self.client is None:
                 self.client = texttospeech.TextToSpeechClient()
@@ -679,7 +678,7 @@ class Tools:
             if not _async:self.wait(delay)
         return delay
 
-    def show(self,id,text="",img="https://testdcp.f80lab.com/assets/img/cercle_blanc.png",scale=1.1):
+    def show(self,id,text="",img="https://testdcp.f80.fr/assets/img/cercle_blanc.png",scale=1.1):
         """
 
         :param id:
@@ -709,7 +708,7 @@ class Tools:
 
 
 
-    def title(self,title,subtitle="",background="black",removeCache=True):
+    def title(self,title,subtitle="",style="",background="black",removeCache=True):
         """
 
         :param title:

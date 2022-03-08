@@ -4,8 +4,8 @@ from tools import Tools
 
 
 class DataCultureUser(Tools):
-    def __init__(self,domain="http://localhost:4200",username="",password="",fastMode=True,quality=1):
-        super().__init__(
+    def __init__(self,json_path,domain="http://localhost:4200",username="",password="",fastMode=True,quality=1):
+        super().__init__(json_path=json_path,
             speech_engine="fr-FR-Standard-A" if quality==0 else "fr-FR-Wavenet-A"
         )
         self.fastMode=fastMode
