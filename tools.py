@@ -1,17 +1,24 @@
+#Module dédié
+#Syntaxe
+#   - $$ permet de ne pas traduire le contenu
+#   - ## exclue l'affichage pour le sous-titre
+#   - !! exclue la voie du sous titre
+import base64
+import json
 import os
 import subprocess
 from datetime import datetime
-from json import dumps
+
 from os.path import exists
 from random import randint, seed, random
 from time import sleep
 
 import mss
 import unidecode
-from google.auth.credentials import Credentials
-from google.cloud import texttospeech
+from google.cloud import texttospeech, translate_v2
 from nerodia.browser import Browser
-from selenium.webdriver import DesiredCapabilities
+from selenium.webdriver import DesiredCapabilities, ActionChains
+from selenium.webdriver.common.by import By
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.proxy import ProxyType, Proxy
@@ -35,11 +42,20 @@ class Tools:
 
     fps=15 #réalisation du film a 15 images par secondes
 
-    def __init__(self,proxy="",json_path="",speech_engine="fr-FR-Wavenet-A"):
+    def __init__(self,proxy="",json_path="",speech_engine="fr-FR-Wavenet-A",translate_into="",subdir=""):
+        self.showSubtitle = True
+        self.translate_dict = None
+        self.translate_engine = None
+        self.source_language = "fr-FR"
         self.json_path = json_path
-        self.subtitle_style = "font-weight:bolder;font-size:large;color:yellow;padding: 5px;"
+        self.set_subtitle_style()
         self.capture_file=""
-        self.subdir = ""
+        self.subdir = subdir
+        if not exists("./"+subdir): os.mkdir("./"+subdir)
+
+        self.translate_dict=dict()
+
+        self.lang=translate_into #voir liste des langues acceptées : https://cloud.google.com/translate/docs/languages
         self.speech_engine=speech_engine
         self.client=None
         self.frames=[]
@@ -62,6 +78,9 @@ class Tools:
         self.scheduler = BackgroundScheduler()
         self.scheduler.start()
 
+    def set_subtitle_style(self,style="font-weight:bolder;font-size:large;color:yellow;padding: 5px;text-shadow: 0 0 2px #000;"):
+        self.subtitle_style=style
+
     def back(self):
         self.browser.back()
 
@@ -79,20 +98,32 @@ class Tools:
         self.browser.window().resize_to(width, width * 4)
         self.init_zone_capture()
 
+    def set_size(self,width=1000,height=800):
+        self.browser.window().move_to(0, 0)
+        self.browser.window().resize_to(width,height)
+        self.init_zone_capture()
+
+    def set_position(self,x=0,y=0,witdh=0,height=0):
+        if witdh>0 and height>0:
+            self.set_size(witdh,height)
+        self.browser.window().move_to(x, y)
+        self.init_zone_capture()
+
     def export(self,format="html"):
         if format=="html":
             return self.browser.html
         else:
             return self.browser.text
 
-    def go(self,url:str=".",subtitle=""):
-        if not url.startswith("http"):url=self.domain+url
+    def go(self,url:str=".",subtitle="",delay=0):
+        if not url.startswith("http"):return False
         if self.browser.url==url:return True
         self.browser.goto(url)
         if len(subtitle)==0:
-            self.wait(1)
+            self.wait(delay+1)
         else:
             self.subtitle(subtitle)
+            self.wait(delay)
         return True
 
 
@@ -113,14 +144,17 @@ class Tools:
         text_file.close()
 
 
+    def scroll_down(self,target="main"):
+        elt=self.driver.find_element_by_id(target)
+        actions=ActionChains(self.driver)
+        actions.key_down(Keys.PAGE_DOWN,elt).perform()
 
 
-    def scroll_down(self):
-        self.browser.send_keys(Keys.PAGE_DOWN)
-
-
-    def mouse_wheeldown(self,wheel=900):
-        self.browser.execute_script("window.scrollBy(0,"+str(wheel)+");")
+    def mouse_wheeldown(self,wheel=500):
+        actions=ActionChains(self.driver)
+        actions.move_by_offset(100,wheel)
+        actions.perform()
+        #self.browser.execute_script("setTimeout(function (){window.scroll(0,"+str(wheel)+");},20)")
 
 
     def getDelay(self,text: str):
@@ -132,7 +166,6 @@ class Tools:
 
             #n_words = len(text.split(" "))
             #return n_words * 300 + 1000
-
 
 
     def set_field(self,id=None,value=None,index=-1):
@@ -179,28 +212,30 @@ class Tools:
 
 
 
-    def find(self,id,index=0,pere=None,onlyId=False,onlyName=False):
+    def find(self,id,index=None,pere=None,onlyId=False,onlyName=False):
         if pere is None:pere=self.browser
-
+        obj=None
         if type(id)==str:
-            obj=pere.element(id=id)
-            if not obj.exist:
-                if onlyId:return None
+            if onlyId:
+                return pere.element(id=id)
 
-                objs=pere.elements(name=id)
-                if not onlyName:
-                    if len(objs) == 0: objs = pere.elements(tag_name=id)
-                    if len(objs)==0: objs=pere.elements(class_name=id)
+            objs=pere.elements(name=id)
+            if not onlyName and len(objs)==0:
+                objs = pere.elements(tag_name=id)
+                if len(objs)==0: objs=pere.elements(class_name=id)
 
-                if type(index)==str:
-                    #On cherche par rapport au contenu
-                    for obj in objs:
-                        if str(obj.text).startswith(index):
-                            return obj
-                else:
-                    if index<=len(objs):obj=objs[index]
 
-            if not obj.exist:return None
+
+            if type(index)==str:
+                #On cherche par rapport au contenu
+                for obj in objs:
+                    if str(obj.text).startswith(index):
+                        return obj
+            else:
+                if not index is None and index<=len(objs):
+                    obj=objs[index]
+
+            if obj and not obj.exist:return None
             return obj
         else:
             #L'objet à trouvé à directement été passé en argument
@@ -258,7 +293,7 @@ class Tools:
         """
 
         if len(filename)==0:
-            filename=unidecode.unidecode(title.replace(" ","_").replace("'","_").replace("é","e"))
+            filename=unidecode.unidecode(title.replace(" ","_").replace("'","_").replace("é","e").replace("$$",""))
             self.log("Génération du nom de fichier depuis le titre : "+filename)
 
         if len(self.capture_file)>0:self.stop(10)
@@ -270,11 +305,13 @@ class Tools:
 
         interval_en_minutes=1/(self.fps*60)
 
-        self.insertCache("black", id_cache="cache_capture", position=9999,delayInSec=0.1)
+
         self.scheduler.add_job(self.job_capture,"interval",minutes=interval_en_minutes,max_instances=1,id="capture_job")
         self.dtStartCapture = self.now()
         self.fastMode=False
+
         if len(title)>0:
+            self.insertCache("black", id_cache="cache_capture", position=9999,delayInSec=0.1)
             self.title(title,subtitle=subtitle,background=background)
             self.removeCache(id_cache="cache_capture")
 
@@ -371,6 +408,7 @@ class Tools:
         text = text.replace("{{TAB}}", Keys.TAB)
         text = text.replace("{{ESC}}", Keys.ESCAPE)
         text = text.replace("{{DOWN}}", Keys.ARROW_DOWN)
+        text = text.replace("{{PAGEDOWN}}", Keys.PAGE_DOWN)
         text = text.replace("{{UP}}", Keys.ARROW_UP)
         text = text.replace("{{ESCAPE}}", Keys.ESCAPE)
         text = text.replace("{{WAIT}}", chr(8))
@@ -544,28 +582,77 @@ class Tools:
 
 
 
-    def waitFor(self, elt,timeout=10):
+    def waitFor(self, elt,timeout=10,disapear=False):
         for essai in range(timeout):
             self.wait(1)
             obj=self.find(elt)
-            if not obj is None:
+            if (not disapear and not obj is None) or (disapear and obj is None):
                 return True
 
         return False
 
 
-    def waitForURL(self, text,timeout=10):
+    def waitForURL(self, text,timeout=10,disapear=False):
         for essai in range(timeout):
-            if text in self.browser.url:
+            if (not disapear and text in self.browser.url) or (disapear and not text in self.browser.url):
                 return True
             self.wait(1)
 
         return False
 
+    def get_from_translate_dict(self,text,lang=None):
+        if lang is None:lang=self.lang
+        if text.startswith("$$"): return text.replace("$$","")
+        text=text.replace("##","").replace("!!","")
+        if self.translate_dict is None:
+            dict_file="./"+self.subdir+"/translate_dict.json"
+            if not exists(dict_file):
+                self.translate_dict=dict()
+            else:
+                with open(dict_file,"r",encoding="utf8") as inputfile:
+                    self.translate_dict=json.load(inputfile)
+
+        if text in self.translate_dict and lang in self.translate_dict[text]: return self.translate_dict[text][lang]
+
+        return None
+
+
+    def add_to_translate_dict(self,text,translate_text,lang=None):
+        if lang is None:lang=self.lang
+        if not text in self.translate_dict:self.translate_dict[text]=dict()
+        text=text.replace("##","").replace("!!","")
+        self.translate_dict[text][lang]=translate_text.replace("##","").replace("!!","")
+        dict_file="./"+self.subdir+"/translate_dict.json"
+        with open(dict_file, "w",encoding='utf8') as outfile:
+            json.dump(self.translate_dict,outfile,ensure_ascii=False)
 
 
 
-    def speak(self,text: str, output_filename="",lang='fr-FR'):
+
+    def translate(self,text,to_lang=None,src_lang=None):
+        if to_lang is None:to_lang=self.lang
+        if src_lang is None:src_lang=self.source_language
+
+        rc={"translatedText":self.get_from_translate_dict(text,to_lang)}
+        if rc["translatedText"] is None and to_lang!="":
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=self.json_path
+            if self.translate_engine is None:
+                #voir https://googleapis.dev/python/translation/latest/translate_v3/translation_service.html
+                self.translate_engine = translate_v2.Client(to_lang.split("-")[0]) #https://cloud.google.com/translate/docs/languages
+            try:
+                rc=self.translate_engine.translate(text.replace("!!","").replace("##",""),target_language=to_lang.split("-")[0], source_language=src_lang.split("-")[0],model="base")
+                if text.startswith("!!"):rc["translatedText"]="!!"+rc["translatedText"]
+                if text.startswith("##"):rc["translatedText"]="##"+rc["translatedText"]
+                self.add_to_translate_dict(text,rc["translatedText"],to_lang)
+            except Exception as inst:
+                self.log("Probleme de traduction "+str(inst.args))
+                pass
+
+        return rc["translatedText"]
+
+
+
+    def speak(self,text: str):
         """
 
         :param text:
@@ -574,21 +661,19 @@ class Tools:
         """
         if self.fastMode or self.dtStartCapture is None or len(text)==0 or text.startswith("!!"):return 0.5
 
-        if len(output_filename) == 0:
-            output_filename = self.getSoundFile(text)
+        output_filename = self.getSoundFile(text)
 
-        #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:\\Users\\hhoar\\PycharmProjects\\test_kerberus\\testandcapture-9fc576cad7c7.json"
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=self.json_path
         if not exists(output_filename):
             if self.client is None:
                 self.client = texttospeech.TextToSpeechClient()
 
-            synthesis_input = texttospeech.SynthesisInput(ssml=text)
-            voice = texttospeech.VoiceSelectionParams(name=self.speech_engine, language_code=lang,
+            #Liste des moteurs
+            synthesis_input = texttospeech.SynthesisInput(ssml=text.replace("!!","").replace("##","").replace("$$",""))
+            voice = texttospeech.VoiceSelectionParams(name=self.speech_engine, language_code=self.lang+"-"+self.lang.upper(),
                                                       ssml_gender=texttospeech.SsmlVoiceGender.FEMALE)
             #
             audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.OGG_OPUS)
-            delay=3
             try:
                 self.log("Vocalisation de la phrase " + text)
                 response = self.client.synthesize_speech(input=synthesis_input,voice=voice, audio_config=audio_config)
@@ -599,7 +684,7 @@ class Tools:
                     out.close()
 
             except Exception as inst:
-                self.log("Probléme de génération du fichier "+str(inst.args)+" avec "+key_file+" comme fichier de credential")
+                self.log("Probléme de génération du fichier "+str(inst.args))
 
         delay = getDuration(output_filename) + SUP_DELAY_SPEAK
 
@@ -616,9 +701,6 @@ class Tools:
         self.videoBatchFile = self.videoBatchFile+code + "\n"
 
         return delay
-
-
-
 
 
 
@@ -661,24 +743,28 @@ class Tools:
         return True
 
 
-    def getSoundFile(self,text:str,lang="fr-FR"):
-        return "./speech/voice_" + str(text.__hash__())+"_"+lang+"_"+self.speech_engine+".ogg"
+    def getSoundFile(self,text:str):
+        return "./"+self.subdir+"/voice_" + str(text.__hash__())+"_"+self.speech_engine+".ogg"
 
 
+    def subtitle(self,text,position="90vh",_async=False,force=False):
+        total_delay=0
+        for txt in text.split("|"):
+            txt=self.translate(txt)
+            if not txt in self.histo:
+                self.log(txt)
+                self.histo.append(txt)
+                if position=="top":position="10vh"
+                delay = self.speak(txt)
+                if txt.startswith("!!"):txt=txt.replace("!!","")
+                if force or (not txt.startswith("##") and self.showSubtitle):
+                    self.execute("showSubtitle",txt,delay*1000,self.subtitle_style,position)
+                if not _async:self.wait(delay)
+                total_delay=total_delay+delay
 
-    def subtitle(self,text,position="90vh",_async=False):
-        delay=0
-        if not text in self.histo:
-            self.log(text)
-            self.histo.append(text)
-            if position=="top":position="10vh"
-            delay = self.speak(text)
-            if text.startswith("!!"):text=text.replace("!!","")
-            self.execute("showSubtitle",text,delay*1000,self.subtitle_style,position)
-            if not _async:self.wait(delay)
-        return delay
+        return total_delay
 
-    def show(self,id,text="",img="https://testdcp.f80.fr/assets/img/cercle_blanc.png",scale=1.1):
+    def show(self,id,text="",img="https://www.propizi.com/images/home/hero_shape.svg",scale=1.1):
         """
 
         :param id:
@@ -708,7 +794,7 @@ class Tools:
 
 
 
-    def title(self,title,subtitle="",style="",background="black",removeCache=True):
+    def title(self,title,subtitle="",style="color:white",background="black",removeCache=True):
         """
 
         :param title:
@@ -717,6 +803,8 @@ class Tools:
         :param background:
         :return:
         """
+        subtitle=self.translate(subtitle)
+        title=self.translate(title)
         id_cache="cache_"+str(self.now())
         if not self.fastMode and not title in self.histo:
             if len(background)>0:
@@ -730,8 +818,7 @@ class Tools:
 
             delay=self.speak("<speak>"+to_speak+"</speak>")
             if delay<3:delay=3
-            if title.startswith("!!"):title=title.replace("!!","")
-            self.execute("showTitle",title,subtitle,delay*1000+500,"color:white")
+            self.execute("showTitle",title.replace("!!",""),subtitle,delay*1000+500,style)
             self.wait(delay-1)
 
             if len(background) > 0 and removeCache:
@@ -761,7 +848,8 @@ class Tools:
                 i=i+1
                 data=data.replace("#"+str(i),str(arg))
 
-        browserToExecute.execute_script(data)
+        result=browserToExecute.execute_script(data)
+        return result
 
 
     def select(self, elt, value):
@@ -788,26 +876,35 @@ class Tools:
         return rc
 
     def log(self,text: str, sep='\n'):
-        line: str = str(int(self.now() - self.startLog)) + " : " + text
-        print(line)
-        #store_log = line + sep + store_log[0:10000]
+        if not text is None:
+            line: str = str(int(self.now() - self.startLog)) + " : " + text
+            print(line)
+            #store_log = line + sep + store_log[0:10000]
         return text
 
     def maximize(self):
         self.browser.window().maximize()
         self.init_zone_capture()
 
+    def imageToBase64(self,filename:str):
+        with open(filename, "rb") as image_file:
+            data=base64.b64encode(image_file.read())
 
-    def insertCache(self,background:str="black",delayInSec=1,position=1000,id_cache=""):
-        if background.startswith("http"):
-            style = "background:center / cover no-repeat url('" + background + "');background-color:black;)"
+        ext=filename[filename.rindex(".")+1:]
+        return "data:image/"+ext+";base64,"+str(data,"utf8")
+
+
+    def insertCache(self,background:str="black",image="",delayInSec=1,position=1000,id_cache="",size="cover"):
+        if len(image)>0:
+            style = "background:center / "+size+" no-repeat url('" + image + "');background-color:"+background+";)"
         else:
             style = "background-color:" + background
-
         self.execute("insertCache",delayInSec,style,position,id_cache)
 
-    def removeCache(self,id_cache="TAC_cache"):
-        self.execute("removeCache",id_cache)
+
+    def removeCache(self,id_cache="TAC_cache",delayInSec=1):
+        self.execute("removeCache",id_cache,delayInSec)
+        self.wait(delayInSec)
 
 
 

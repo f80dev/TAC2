@@ -2,5 +2,8 @@ unidecode
 mss
 nerodia
 google-cloud-texttospeech
+google-cloud-translate
 opencv-python
 mutagen
+pytest
+

@@ -1,4 +1,4 @@
-var delayInSec=#1/1000;
+var delayInSec=#1;
 
 if(document.getElementById("#4")==null){
     var div=document.createElement("div");
