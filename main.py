@@ -2,23 +2,19 @@ from sys import argv
 
 if "scenario" in argv:
     from lafaaac import LaFaaac
-    tuto=LaFaaac(fastMode=False,quality=0,lang="en-US")
+    tuto=LaFaaac(fastMode=False,quality=0,lang="en-US",showSubtitle=True)
 
     tuto.set_position(0,-80,900,1100)
+    #tuto.set_position(0,0,900,1100)
+
     tuto.set_subtitle_style("font-weight:bolder;font-size:x-large;color:black;padding: 5px;text-shadow: 1px 1px 2px white, 0 0 1em white, 0 0 0.2em white")
+
+    tuto.login("j.lecanu@femis.fr","123456789",lang="fr")
 
     tuto.capture("DemoLaFaac")
     tuto.intro()
 
-    tuto.login("j.lecanu@femis.fr","123456789")
     tuto.open_formation()
-    tuto.subtitle("##Regardons à présent le détail d'un module")
-    tuto.detail_formation("https://lafaaac-webapp.teachonmars.com/training/1-scenario-personnages_2021_v1_ASF","Les personnages","https://lafaaac-webapp.teachonmars.com/training/1-scenario-personnages_2021_v1_ASF/activity/3_1","Les parcours sont augmentés de Vidéos de témoignages d'Experts, Scénaristes ou Producteur|Des questions viennent régulièrement verifier votre apprentissage|")
-    #tuto.subtitle("Les parcours sont augmentés de Vidéos de témoignages d'Experts, Scénaristes ou Producteur|Des questions viennent régulièrement tester votre apprentissage|Des jeux vous permettent de vérifier vos connaissances")
-
-    #tuto.go("https://lafaaac-webapp.teachonmars.com/training/1-scenario-personnages_2021_v1_ASF","L'application vous accompagne dans votre smartphone partout, à chaque instant !")
-    #tuto.go("https://lafaaac-webapp.teachonmars.com/category/scenario-1569572663","vous pouvez reprendre où bon vous semble pour réviser")
-    tuto.subtitle("vous pouvez reprendre où bon vous semble pour réviser")
 
     tuto.logout()
     tuto.show_store()

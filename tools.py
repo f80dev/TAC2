@@ -221,8 +221,8 @@ class Tools:
 
             objs=pere.elements(name=id)
             if not onlyName and len(objs)==0:
-                objs = pere.elements(tag_name=id)
-                if len(objs)==0: objs=pere.elements(class_name=id)
+                objs=pere.elements(class_name=id)
+                if len(objs)==0: objs = pere.elements(tag_name=id)
 
 
 
@@ -245,6 +245,13 @@ class Tools:
     def size(self, width, height):
         self.browser.window().resize_to(width,height)
         self.init_zone_capture()
+
+
+    def showImage(self,src,style="width:100vw;object-fit:cover",subtitle=""):
+        delay=self.speak(subtitle)
+        if delay<1:delay=1
+        self.execute("showImages",src,delay,style)
+        self.subtitle(subtitle)
 
 
     def click(self,id,index=0,timeout=0.2,text=""):
