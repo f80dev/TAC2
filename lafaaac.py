@@ -130,8 +130,6 @@ class LaFaaac(Tools):
 
 
 
-
-
     def settings(self,lang=""):
         self.go("https://lafaaac-webapp.teachonmars.com/profile","Chaque utilisateur dispose d'un espace personnel")
         if len(lang)>0:
